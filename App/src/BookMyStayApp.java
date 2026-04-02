@@ -24,6 +24,14 @@ abstract class Room {
     }
 
     public abstract String getRoomType();
+
+    public void displayDetails() {
+        System.out.println("Room Type: " + getRoomType());
+        System.out.println("Beds: " + beds);
+        System.out.println("Size: " + size + " sq.ft");
+        System.out.println("Price: ₹" + price);
+        System.out.println("-----------------------------");
+    }
 }
 
 class SingleRoom extends Room {
@@ -70,17 +78,23 @@ class RoomInventory {
     public int getAvailability(String type) {
         return inventory.getOrDefault(type, 0);
     }
+}
 
-    public void updateAvailability(String type, int count) {
-        if (inventory.containsKey(type)) {
-            inventory.put(type, count);
-        }
+class RoomSearchService {
+    private RoomInventory inventory;
+
+    public RoomSearchService(RoomInventory inventory) {
+        this.inventory = inventory;
     }
 
-    public void displayInventory() {
-        System.out.println("===== ROOM INVENTORY =====");
-        for (String type : inventory.keySet()) {
-            System.out.println(type + ": " + inventory.get(type));
+    public void search(Room[] rooms) {
+        System.out.println("===== AVAILABLE ROOMS =====");
+        for (Room room : rooms) {
+            int available = inventory.getAvailability(room.getRoomType());
+            if (available > 0) {
+                room.displayDetails();
+                System.out.println("Available: " + available);
+            }
         }
     }
 }
@@ -91,17 +105,14 @@ public class BookMyStayApp {
         Room doubleRoom = new DoubleRoom();
         Room suite = new SuiteRoom();
 
-        RoomInventory inventory = new RoomInventory();
+        Room[] rooms = {single, doubleRoom, suite};
 
+        RoomInventory inventory = new RoomInventory();
         inventory.addRoomType(single.getRoomType(), 5);
-        inventory.addRoomType(doubleRoom.getRoomType(), 3);
+        inventory.addRoomType(doubleRoom.getRoomType(), 0);
         inventory.addRoomType(suite.getRoomType(), 2);
 
-        inventory.displayInventory();
-
-        inventory.updateAvailability("Single Room", 4);
-
-        System.out.println("After Update:");
-        inventory.displayInventory();
+        RoomSearchService searchService = new RoomSearchService(inventory);
+        searchService.search(rooms);
     }
 }
