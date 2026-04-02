@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 abstract class Room {
     private int beds;
     private double size;
@@ -22,15 +24,6 @@ abstract class Room {
     }
 
     public abstract String getRoomType();
-
-    public void displayRoomDetails(int availability) {
-        System.out.println("Room Type: " + getRoomType());
-        System.out.println("Beds: " + beds);
-        System.out.println("Size: " + size + " sq.ft");
-        System.out.println("Price: ₹" + price);
-        System.out.println("Available Rooms: " + availability);
-        System.out.println("-----------------------------");
-    }
 }
 
 class SingleRoom extends Room {
@@ -63,22 +56,52 @@ class SuiteRoom extends Room {
     }
 }
 
+class RoomInventory {
+    private HashMap<String, Integer> inventory;
+
+    public RoomInventory() {
+        inventory = new HashMap<>();
+    }
+
+    public void addRoomType(String type, int count) {
+        inventory.put(type, count);
+    }
+
+    public int getAvailability(String type) {
+        return inventory.getOrDefault(type, 0);
+    }
+
+    public void updateAvailability(String type, int count) {
+        if (inventory.containsKey(type)) {
+            inventory.put(type, count);
+        }
+    }
+
+    public void displayInventory() {
+        System.out.println("===== ROOM INVENTORY =====");
+        for (String type : inventory.keySet()) {
+            System.out.println(type + ": " + inventory.get(type));
+        }
+    }
+}
+
 public class BookMyStayApp {
     public static void main(String[] args) {
         Room single = new SingleRoom();
         Room doubleRoom = new DoubleRoom();
         Room suite = new SuiteRoom();
 
-        int singleAvailability = 5;
-        int doubleAvailability = 3;
-        int suiteAvailability = 2;
+        RoomInventory inventory = new RoomInventory();
 
-        System.out.println("===== HOTEL ROOM AVAILABILITY =====");
+        inventory.addRoomType(single.getRoomType(), 5);
+        inventory.addRoomType(doubleRoom.getRoomType(), 3);
+        inventory.addRoomType(suite.getRoomType(), 2);
 
-        single.displayRoomDetails(singleAvailability);
-        doubleRoom.displayRoomDetails(doubleAvailability);
-        suite.displayRoomDetails(suiteAvailability);
+        inventory.displayInventory();
 
-        System.out.println("===== APPLICATION TERMINATED =====");
+        inventory.updateAvailability("Single Room", 4);
+
+        System.out.println("After Update:");
+        inventory.displayInventory();
     }
 }
